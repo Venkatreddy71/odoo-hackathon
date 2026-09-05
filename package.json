@@ -1,0 +1,27 @@
+{
+  "name": "peoplepay360",
+  "version": "1.0.0",
+  "description": "PeoplePay360 - Integrated HR & Payroll Management System",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "server": "nodemon server/server.js",
+    "client": "npm run dev --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "seed": "node server/services/seedService.js"
+  },
+  "keywords": [
+    "mern",
+    "payroll",
+    "hr",
+    "attendance",
+    "contracts",
+    "peoplepay360"
+  ],
+  "author": "PeoplePay360 Team",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.1.0"
+  }
+}
