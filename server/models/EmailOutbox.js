@@ -13,8 +13,9 @@ const emailOutboxSchema = new mongoose.Schema(
     employee: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Employee',
-      required: true,
+      required: false,
     },
+
     payslip: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Payslip',

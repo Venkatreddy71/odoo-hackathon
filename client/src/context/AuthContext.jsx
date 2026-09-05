@@ -43,6 +43,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const register = async (formData) => {
+    const res = await API.post('/auth/register', formData);
+    if (res.data.success) {
+      const { token: jwtToken, user: userData } = res.data;
+      setToken(jwtToken);
+      setUser(userData);
+      localStorage.setItem('peoplepay_token', jwtToken);
+      localStorage.setItem('peoplepay_user', JSON.stringify(userData));
+      return userData;
+    }
+  };
+
   const logout = () => {
     setToken(null);
     setUser(null);
@@ -51,7 +63,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

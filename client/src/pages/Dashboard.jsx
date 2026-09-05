@@ -287,24 +287,16 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Header & Filter Controls Bar */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-slate-900/90 border border-slate-800 p-5 rounded-2xl shadow-xl backdrop-blur-md">
-        <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            HR Command Center
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-semibold">
-              Live DB Aggregation
-            </span>
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">Real-time metrics connected across HR records, attendance, leave, and payroll engine.</p>
+      {/* Filter Controls Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-xl backdrop-blur-md">
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-indigo-400 shrink-0" />
+          <span className="text-xs text-slate-300 font-bold uppercase tracking-wider">Dashboard Filters</span>
         </div>
 
         {/* Global Dashboard Filters */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
-            <Filter className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-            <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Filters</span>
-          </div>
+
 
           {/* Period Filter */}
           <select

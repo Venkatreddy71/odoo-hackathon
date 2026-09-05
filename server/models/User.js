@@ -17,8 +17,8 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['ADMIN', 'HR_MANAGER', 'PAYROLL_USER', 'HR_PAYROLL_MANAGER', 'EMPLOYEE'],
-      default: 'EMPLOYEE',
+      enum: ['UNASSIGNED', 'ADMIN', 'HR_MANAGER', 'PAYROLL_USER', 'HR_PAYROLL_MANAGER', 'EMPLOYEE'],
+      default: 'UNASSIGNED',
     },
     employee: {
       type: mongoose.Schema.Types.ObjectId,
@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['ACTIVE', 'INACTIVE'],
+      enum: ['ACTIVE', 'INACTIVE', 'PENDING_APPROVAL'],
       default: 'ACTIVE',
     },
   },

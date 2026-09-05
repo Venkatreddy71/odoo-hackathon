@@ -122,8 +122,12 @@ const createRequest = async (req, res, next) => {
   try {
     const { employee, type, startDate, endDate, numberOfDays, reason } = req.body;
 
-    // Scope to logged-in employee if employee role
-    const empId = req.user.role === 'EMPLOYEE' ? req.user.employee._id : employee;
+    // Resolve target employee ID: use provided employee ID or fallback to logged-in user's employee profile
+    const empId = employee || (req.user.employee ? (req.user.employee._id || req.user.employee) : null);
+
+    if (!empId) {
+      return res.status(400).json({ success: false, message: 'User account is not linked to an employee profile. Please select an employee.' });
+    }
 
     const request = await TimeOffRequest.create({
       employee: empId,

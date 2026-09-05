@@ -25,9 +25,26 @@ export default function PayslipDetails() {
     }
   };
 
-  const handleDownloadPDF = () => {
-    const token = localStorage.getItem('peoplepay_token');
-    window.open(`/api/payslips/${id}/pdf?token=${token}`, '_blank');
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownloadPDF = async () => {
+    setDownloading(true);
+    try {
+      const response = await API.get(`/payslips/${id}/pdf`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      const empId = payslip?.employee?.employeeId || 'EMP';
+      link.setAttribute('download', `Payslip_${empId}_${id.substring(18)}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('PDF download error:', err);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   if (loading) {

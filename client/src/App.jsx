@@ -55,10 +55,11 @@ export default function App() {
         <Route path="/payruns/:id" element={<PayrunDetails />} />
       </Route>
 
-      {/* Admin Only Routes */}
-      <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+      {/* Admin, HR & Payroll User & Role Control Center */}
+      <Route element={<ProtectedRoute allowedRoles={['ADMIN', 'HR_MANAGER', 'PAYROLL_USER', 'HR_PAYROLL_MANAGER']} />}>
         <Route path="/users" element={<Users />} />
       </Route>
+
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

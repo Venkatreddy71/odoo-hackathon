@@ -24,6 +24,22 @@ export default function Payslips() {
     }
   };
 
+  const handleDownloadPDF = async (id, empId) => {
+    try {
+      const response = await API.get(`/payslips/${id}/pdf`, { responseType: 'blob' });
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `Payslip_${empId || 'EMP'}_${id.substring(18)}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('PDF download error:', err);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -69,13 +85,20 @@ export default function Payslips() {
                       {ps.status}
                     </span>
                   </td>
-                  <td className="p-4 text-right">
+                  <td className="p-4 text-right flex justify-end items-center gap-2">
                     <Link
                       to={`/payslips/${ps._id}`}
-                      className="inline-flex items-center gap-1 px-3.5 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded-xl text-xs font-semibold transition"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold transition"
                     >
                       <Eye className="w-3.5 h-3.5" /> View Breakdown
                     </Link>
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadPDF(ps._id, ps.employee?.employeeId)}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-semibold transition shadow-lg shadow-indigo-600/20"
+                    >
+                      <Download className="w-3.5 h-3.5" /> PDF
+                    </button>
                   </td>
                 </tr>
               ))}

@@ -30,6 +30,7 @@ export default function Sidebar() {
       items: [
         { label: 'Dashboard', path: '/', icon: LayoutDashboard, roles: ['ADMIN', 'HR_MANAGER', 'PAYROLL_USER', 'HR_PAYROLL_MANAGER', 'EMPLOYEE'] },
         { label: 'Employees', path: '/employees', icon: Users, roles: ['ADMIN', 'HR_MANAGER', 'PAYROLL_USER', 'HR_PAYROLL_MANAGER', 'EMPLOYEE'] },
+        { label: 'User Control System', path: '/users', icon: UserCheck, roles: ['ADMIN', 'HR_MANAGER', 'PAYROLL_USER', 'HR_PAYROLL_MANAGER'] },
         { label: 'Contracts', path: '/contracts', icon: FileSignature, roles: ['ADMIN', 'HR_MANAGER', 'PAYROLL_USER', 'HR_PAYROLL_MANAGER'] },
         { label: 'Working Schedules', path: '/working-schedules', icon: CalendarClock, roles: ['ADMIN', 'HR_MANAGER', 'PAYROLL_USER', 'HR_PAYROLL_MANAGER'] },
         { label: 'Attendance', path: '/attendance', icon: Clock, roles: ['ADMIN', 'HR_MANAGER', 'PAYROLL_USER', 'HR_PAYROLL_MANAGER', 'EMPLOYEE'] },
@@ -54,12 +55,14 @@ export default function Sidebar() {
       ],
     },
     {
-      title: 'ADMIN',
+      title: 'ADMINISTRATION',
       items: [
-        { label: 'Users', path: '/users', icon: UserCheck, roles: ['ADMIN'] },
-        { label: 'Settings', path: '/settings', icon: Settings, roles: ['ADMIN'] },
+        { label: 'User Control Center', path: '/users', icon: UserCheck, roles: ['ADMIN', 'HR_MANAGER', 'PAYROLL_USER', 'HR_PAYROLL_MANAGER'] },
       ],
     },
+
+
+
   ];
 
   return (

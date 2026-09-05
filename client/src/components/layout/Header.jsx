@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import API from '../../services/api';
-import { LogOut, Clock, Play, Square, CheckCircle } from 'lucide-react';
+import { LogOut, Clock, Play, Square, ShieldCheck, User, UserCheck } from 'lucide-react';
+
 
 export default function Header() {
   const { user, logout } = useAuth();
@@ -9,11 +11,15 @@ export default function Header() {
   const [elapsedTime, setElapsedTime] = useState('00:00:00');
   const [loading, setLoading] = useState(false);
 
+  const hasEmployeeProfile = Boolean(user?.employee);
+
   useEffect(() => {
-    fetchAttendanceStatus();
-    const interval = setInterval(fetchAttendanceStatus, 15000);
-    return () => clearInterval(interval);
-  }, []);
+    if (hasEmployeeProfile) {
+      fetchAttendanceStatus();
+      const interval = setInterval(fetchAttendanceStatus, 15000);
+      return () => clearInterval(interval);
+    }
+  }, [hasEmployeeProfile]);
 
   // Timer tick for active working session
   useEffect(() => {
@@ -73,46 +79,67 @@ export default function Header() {
     <header className="h-16 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-6 flex items-center justify-between sticky top-0 z-30">
       <div className="flex items-center gap-4">
         <h2 className="text-sm font-semibold text-slate-300">
-          Welcome back, <span className="text-white font-bold">{user?.employee ? `${user.employee.firstName} ${user.employee.lastName}` : user?.email}</span>
+          Welcome back,{' '}
+          <span className="text-white font-bold">
+            {user?.employee ? `${user.employee.firstName} ${user.employee.lastName}` : user?.email}
+          </span>
         </h2>
       </div>
 
-      {/* Attendance Clock Widget */}
+      {/* Attendance Clock Widget for Employees vs Admin Badge */}
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-3 bg-slate-900/90 px-4 py-1.5 rounded-full border border-slate-800 shadow-inner">
-          {attendanceStatus?.isWorking ? (
-            <>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span className="text-xs font-semibold text-emerald-400">Working</span>
-              </div>
-              <span className="text-xs font-mono font-bold text-slate-200 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
-                {elapsedTime}
-              </span>
-              <button
-                onClick={handleCheckOut}
-                disabled={loading}
-                className="flex items-center gap-1 px-3 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded-full text-xs font-semibold transition shadow-md shadow-rose-600/20"
-              >
-                <Square className="w-3 h-3 fill-white" /> Check Out
-              </button>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
-                <span className="text-xs font-semibold text-slate-400">Not Clocked In</span>
-              </div>
-              <button
-                onClick={handleCheckIn}
-                disabled={loading}
-                className="flex items-center gap-1 px-3.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full text-xs font-semibold transition shadow-md shadow-emerald-600/20"
-              >
-                <Play className="w-3 h-3 fill-white" /> Check In
-              </button>
-            </>
-          )}
-        </div>
+        {hasEmployeeProfile ? (
+          <div className="flex items-center gap-3 bg-slate-900/90 px-4 py-1.5 rounded-full border border-slate-800 shadow-inner">
+            {attendanceStatus?.isWorking ? (
+              <>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span className="text-xs font-semibold text-emerald-400">Working</span>
+                </div>
+                <span className="text-xs font-mono font-bold text-slate-200 bg-slate-950 px-2 py-0.5 rounded border border-slate-800">
+                  {elapsedTime}
+                </span>
+                <button
+                  onClick={handleCheckOut}
+                  disabled={loading}
+                  className="flex items-center gap-1 px-3 py-1 bg-rose-600 hover:bg-rose-500 text-white rounded-full text-xs font-semibold transition shadow-md shadow-rose-600/20"
+                >
+                  <Square className="w-3 h-3 fill-white" /> Check Out
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-slate-500"></span>
+                  <span className="text-xs font-semibold text-slate-400">Not Clocked In</span>
+                </div>
+                <button
+                  onClick={handleCheckIn}
+                  disabled={loading}
+                  className="flex items-center gap-1 px-3.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full text-xs font-semibold transition shadow-md shadow-emerald-600/20"
+                >
+                  <Play className="w-3 h-3 fill-white" /> Check In
+                </button>
+              </>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 bg-indigo-950/60 border border-indigo-800/60 px-3.5 py-1.5 rounded-full text-xs font-semibold text-indigo-300">
+            <ShieldCheck className="w-4 h-4 text-indigo-400" />
+            <span>System Management Account</span>
+          </div>
+        )}
+
+        {['ADMIN', 'HR_MANAGER', 'PAYROLL_USER', 'HR_PAYROLL_MANAGER'].includes(user?.role) && (
+          <Link
+            to="/users"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600/20 hover:bg-indigo-600 text-indigo-300 hover:text-white rounded-xl border border-indigo-500/30 text-xs font-bold transition shadow-sm"
+            title="Manage Users & Roles"
+          >
+            <UserCheck className="w-4 h-4 text-indigo-400" />
+            <span>User Control</span>
+          </Link>
+        )}
 
         {/* User Logout Button */}
         <button
@@ -123,6 +150,7 @@ export default function Header() {
           <LogOut className="w-4 h-4" />
           <span>Logout</span>
         </button>
+
       </div>
     </header>
   );

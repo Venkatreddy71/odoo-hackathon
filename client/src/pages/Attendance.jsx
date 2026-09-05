@@ -16,7 +16,6 @@ import {
   History,
   UserCheck,
   Building,
-  Calendar,
 } from 'lucide-react';
 
 export default function Attendance() {
@@ -30,7 +29,7 @@ export default function Attendance() {
   const [status, setStatus] = useState(null);
   const [elapsedTime, setElapsedTime] = useState('00:00:00');
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('all');
+  const [activeTab, setActiveTab] = useState('all'); // 'all' or 'issues'
 
   // Filters State
   const [selectedDept, setSelectedDept] = useState('');
@@ -47,6 +46,7 @@ export default function Attendance() {
   });
 
   const canEdit = ['ADMIN', 'HR_MANAGER', 'HR_PAYROLL_MANAGER', 'PAYROLL_USER'].includes(user?.role);
+  const hasEmployeeProfile = Boolean(user?.employee);
 
   useEffect(() => {
     fetchAttendance();
@@ -83,7 +83,7 @@ export default function Attendance() {
       if (search) params.append('search', search);
 
       const res = await API.get(`/attendance?${params.toString()}`);
-      if (res.data.success) setAttendance(res.data.attendance);
+      if (res.data.success) setAttendance(res.data.attendance || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -101,6 +101,7 @@ export default function Attendance() {
   };
 
   const fetchStatus = async () => {
+    if (!hasEmployeeProfile) return;
     try {
       const res = await API.get('/attendance/status');
       if (res.data.success) setStatus(res.data);
@@ -112,7 +113,7 @@ export default function Attendance() {
   const fetchIssues = async () => {
     try {
       const res = await API.get('/attendance/issues');
-      if (res.data.success) setIssues(res.data.issues);
+      if (res.data.success) setIssues(res.data.issues || []);
     } catch (err) {
       console.error(err);
     }
@@ -224,48 +225,50 @@ export default function Attendance() {
 
   return (
     <div className="space-y-6">
-      {/* Header & Live Punch Card Widget */}
+      {/* Header & Punch Card Widget */}
       <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 backdrop-blur-md">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
             <Clock className="w-6 h-6 text-indigo-400" /> Attendance Management
           </h1>
-          <p className="text-xs text-slate-400 mt-1">Live punch clock, attendance auditing, and authorized correction workflow.</p>
+          <p className="text-xs text-slate-400 mt-1">Live punch clock, attendance auditing, and authorized corrections.</p>
         </div>
 
-        {/* Punch Clock Widget */}
-        <div className="bg-slate-950 border border-slate-800 p-4 rounded-xl flex items-center gap-4 shadow-inner">
-          {status?.isWorking ? (
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-                <div>
-                  <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Active Work Session</div>
-                  <div className="text-xl font-mono font-bold text-white tracking-wider">{elapsedTime}</div>
+        {/* Punch Clock Widget (only for linked employee profiles) */}
+        {hasEmployeeProfile && (
+          <div className="bg-slate-950 border border-slate-800 p-4 rounded-xl flex items-center gap-4 shadow-inner">
+            {status?.isWorking ? (
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <div>
+                    <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Active Work Session</div>
+                    <div className="text-xl font-mono font-bold text-white tracking-wider">{elapsedTime}</div>
+                  </div>
                 </div>
+                <button
+                  onClick={handleCheckOut}
+                  className="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-semibold text-xs transition shadow-lg shadow-rose-600/30 flex items-center gap-2"
+                >
+                  <Square className="w-4 h-4 fill-white" /> CHECK OUT
+                </button>
               </div>
-              <button
-                onClick={handleCheckOut}
-                className="px-5 py-2.5 bg-rose-600 hover:bg-rose-500 text-white rounded-xl font-semibold text-xs transition shadow-lg shadow-rose-600/30 flex items-center gap-2"
-              >
-                <Square className="w-4 h-4 fill-white" /> CHECK OUT
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center gap-4">
-              <div>
-                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Punch Status</div>
-                <div className="text-xs font-bold text-slate-200">Not Clocked In</div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <div>
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Punch Status</div>
+                  <div className="text-xs font-bold text-slate-200">Not Clocked In</div>
+                </div>
+                <button
+                  onClick={handleCheckIn}
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-semibold text-xs transition shadow-lg shadow-emerald-600/30 flex items-center gap-2"
+                >
+                  <Play className="w-4 h-4 fill-white" /> CHECK IN
+                </button>
               </div>
-              <button
-                onClick={handleCheckIn}
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-semibold text-xs transition shadow-lg shadow-emerald-600/30 flex items-center gap-2"
-              >
-                <Play className="w-4 h-4 fill-white" /> CHECK IN
-              </button>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Filter Bar */}
@@ -316,7 +319,7 @@ export default function Attendance() {
         />
       </div>
 
-      {/* Tabs */}
+      {/* View Tabs */}
       <div className="flex border-b border-slate-800 space-x-4">
         <button
           onClick={() => setActiveTab('all')}
@@ -328,6 +331,7 @@ export default function Attendance() {
         >
           <Clock className="w-4 h-4" /> Attendance Logs ({attendance.length})
         </button>
+
         <button
           onClick={() => setActiveTab('issues')}
           className={`pb-3 text-xs font-semibold flex items-center gap-2 border-b-2 transition ${
