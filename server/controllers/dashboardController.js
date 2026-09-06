@@ -15,12 +15,30 @@ const ActivityLog = require('../models/ActivityLog');
 const getDashboardSummary = async (req, res, next) => {
   try {
     const { period, department, employeeType } = req.query;
-    const isEmployee = req.user.role === 'EMPLOYEE' && req.user.employee;
+    const isEmployee = req.user.role === 'EMPLOYEE';
 
     // -------------------------------------------------------------
     // RENDER 1: EMPLOYEE PERSONAL DASHBOARD SUMMARY
     // -------------------------------------------------------------
     if (isEmployee) {
+      // Handle case where employee profile is not yet linked to user account
+      if (!req.user.employee) {
+        return res.json({
+          success: true,
+          isEmployeeDashboard: true,
+          kpi: {
+            myTotalSalaryEarned: 0,
+            myPaidCount: 0,
+            myTotalPayslips: 0,
+            myBaseWage: 0,
+            myTotalRemainingLeave: 0,
+          },
+          monthlyTrend: [],
+          recentPayslips: [],
+          allocations: [],
+        });
+      }
+
       const empId = req.user.employee._id || req.user.employee;
 
       const myPaidPayslipsAgg = await Payslip.aggregate([

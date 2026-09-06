@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Employee = require('../models/Employee');
 const EmailOutbox = require('../models/EmailOutbox');
 const ActivityLog = require('../models/ActivityLog');
+const { sendCredentialsEmail } = require('../services/emailService');
 const jwt = require('jsonwebtoken');
 
 
@@ -108,13 +109,22 @@ const createUser = async (req, res, next) => {
     // Determine target email for credentials (Personal Mail preferred, fallback to work email)
     const targetEmail = personalEmail || (employee && employee.email) || email;
 
-    // Dispatch Credential Mail to EmailOutbox
+    // Send real email via SMTP (falls back to console log if SMTP not configured)
+    const emailResult = await sendCredentialsEmail({
+      to: targetEmail,
+      workEmail: email.toLowerCase(),
+      password: password,
+      role: role || 'EMPLOYEE',
+      employeeName: employee ? `${employee.firstName} ${employee.lastName}` : null,
+    });
+
+    // Record dispatch in EmailOutbox for audit trail
     const mailRecord = await EmailOutbox.create({
       recipient: targetEmail,
       subject: 'Welcome to PeoplePay360 - Your Account Login Credentials',
       employee: employee ? employee._id : null,
       attachmentName: 'Login_Credentials.txt',
-      status: 'DISPATCHED',
+      status: emailResult.success ? 'DISPATCHED' : 'FAILED',
       sentTime: new Date(),
     });
 

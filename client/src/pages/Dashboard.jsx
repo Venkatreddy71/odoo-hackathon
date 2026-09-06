@@ -133,7 +133,7 @@ export default function Dashboard() {
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-white tracking-tight">
-              My Employee Dashboard
+              Dashboard
             </h1>
             <p className="text-xs text-slate-400 mt-1">
               Personal earnings history, leave allocations, and payslip downloads.
