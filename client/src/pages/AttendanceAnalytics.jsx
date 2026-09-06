@@ -9,8 +9,8 @@ export default function AttendanceAnalytics() {
 
   useEffect(() => {
     fetchAnalytics();
-  }, []);
-
+  }, [data]);
+  
   const fetchAnalytics = async () => {
     try {
       const res = await API.get('/dashboard/summary');
